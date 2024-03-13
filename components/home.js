@@ -208,8 +208,13 @@ const HomeScreen = (props) => {
                     {featuredPeople?.map((tren_ppl, i) => {
                       return(
                         <View key={i} style={styles.trendingMovieBox}>
+                          <TouchableOpacity onPress={() =>
+                              navigation.navigate('People', { id: tren_ppl.id })
+                            }
+                          >
                               <ImageBackground source={{ uri : imgPath + tren_ppl.profile_path }} resizeMode="cover" style={styles.trendingMovieBG}>
                               </ImageBackground>
+                          </TouchableOpacity>
                         </View>
                       );
                     })}
@@ -234,11 +239,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: branding.black,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   scrollView: {
     width: windowWidth,
-    flex: 1
+    flex: 1,
   },
   featuredMovie: {
     width: windowWidth,
@@ -322,7 +327,7 @@ const styles = StyleSheet.create({
   scrollViewTrending: {
     flex: 1,
     paddingLeft: '5%',
-    marginBottom: 60
+    marginBottom: 100
   },
   trendingMovieBox: {
     width: 200,

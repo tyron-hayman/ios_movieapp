@@ -3,13 +3,13 @@ import { NavigationContainer, Link } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, RootTagContext } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BearerToken } from '@env';
+import { BlurView } from 'expo-blur';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import HomeScreen from './components/home';
 import AboutScreen from './components/about';
 import Movies from './components/movies';
 import Television from './components/television';
+import People from './components/people';
 
 import {
   useFonts,
@@ -23,7 +23,7 @@ import {
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-const icoDimen = { size : 25, color: '#000000' };
+const icoDimen = { size : 25, color: '#ffffff' };
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -69,9 +69,15 @@ export default function App() {
                 component={Television}
                 options={{headerShown: false}}
             />
+            <Stack.Screen
+                name="People"
+                component={People}
+                options={{headerShown: false}}
+            />
         </Stack.Navigator>
         <View style={styles.mainNav}>
           <View style={styles.mainNavBox}>
+          <BlurView intensity={20} tint="light" style={styles.blurContainer}>
             <Link to={{ screen: 'Home', params: { id: 'jane' } }} style={styles.navicons}>
               <Ionicons name="home-outline" size={icoDimen.size} color={icoDimen.color} />
             </Link>
@@ -79,6 +85,7 @@ export default function App() {
             <Link to={{ screen: 'About', params: { id: 'jane' } }} style={styles.navicons}>
               <Ionicons name="help-outline" size={icoDimen.size} color={icoDimen.color} />
             </Link>
+          </BlurView>
           </View>
         </View>
     </NavigationContainer>
@@ -90,7 +97,8 @@ const branding = {
   "red"    : '#F72B02',
   "black"  : '#000000',
   "white"  : '#FFFFFF',
-  "black50": 'rgba(0,0,0,0.5)'
+  "black50": 'rgba(0,0,0,0.6)',
+  "white50" : 'rgba(255,255,255,0.5)'
 }
 
 const styles = StyleSheet.create({
@@ -103,13 +111,20 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   mainNavBox: {
+    width: windowWidth / 2,
     flex: 1,
     justifyContent: 'center',
     alignContent: 'center',
     flexDirection: 'row',
-    backgroundColor: branding.white,
+    backgroundColor: branding.black50,
     borderRadius: 20,
     overflow: 'hidden'
+  },
+  blurContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    flexDirection: 'row',
   },
   navicons: {
     paddingLeft: 20,
