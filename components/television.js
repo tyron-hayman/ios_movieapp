@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -41,32 +41,46 @@ const Television = ({ route }) => {
         DMSans_700Bold_Italic,
     });
 
+    useFocusEffect(
+      React.useCallback(() => {
+        setLoading(true);
+    
+        initTV(route.params.id);
+    
+        return () => {
+          setLoading(false);
+        };
+      }, [route.params.id])
+    );
+
     useEffect(() => {
-
-        const options = {
-            method: 'GET',
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: 'Bearer ' + BearerToken
-            }
-          };
-      
-          fetch('https://api.themoviedb.org/3/tv/' + route.params.id, options)
-            .then(response => response.json())
-            .then(response => {
-                const d = new Date(response.last_air_date);
-                let dateName = d.getFullYear();
-                setMovieDetails(response);
-                setMovieDetailsDate(dateName);
-                getMovieCredits(route.params.id);
-                console.log(response);
-            })
-            .catch(error => console.error(error))
-            .finally(() => {
-                setLoading(false);
-            });
-
+      initTV(route.params.id)
     }, []);
+
+    let initTV = (id) => {
+      const options = {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: 'Bearer ' + BearerToken
+        }
+      };
+  
+      fetch('https://api.themoviedb.org/3/tv/' + id, options)
+        .then(response => response.json())
+        .then(response => {
+            const d = new Date(response.last_air_date);
+            let dateName = d.getFullYear();
+            setMovieDetails(response);
+            setMovieDetailsDate(dateName);
+            getMovieCredits(route.params.id);
+            console.log(response);
+        })
+        .catch(error => console.error(error))
+        .finally(() => {
+            setLoading(false);
+        });
+    }
 
     let getMovieCredits = (id) => {
 
@@ -92,6 +106,13 @@ const Television = ({ route }) => {
             {loading ? (
                 <ActivityIndicator size="large" color="#FE8615" />
             ) : (
+              <>
+              <TouchableOpacity style={styles.backBtn} onPress={() =>
+                        navigation.goBack()
+                      }
+                    >
+                      <Ionicons name="chevron-back-outline" size={icoDimen.size} color={icoDimen.color} />
+                    </TouchableOpacity>
                 <ScrollView style={styles.scrollView}>
                     <ImageBackground source={{ uri : imgPath + movieDetails.poster_path }} style={styles.featuredMovie}>
                         <LinearGradient
@@ -143,6 +164,7 @@ const Television = ({ route }) => {
                         </ScrollView>
                     </View>
                 </ScrollView>
+                </>
             )}
         </View>
     );
@@ -166,6 +188,16 @@ const styles = StyleSheet.create({
       scrollView: {
         width: windowWidth,
         flex: 1
+      },
+      backBtn: {
+        position: 'absolute',
+        left: '5%',
+        top: 60,
+        zIndex: 10,
+        backgroundColor: branding.black,
+        padding: 10,
+        borderRadius: 9999,
+        overflow: 'hidden'
       },
       featuredMovie: {
         width: windowWidth,

@@ -97,7 +97,7 @@ const branding = {
   "red"    : '#F72B02',
   "black"  : '#000000',
   "white"  : '#FFFFFF',
-  "black50": 'rgba(0,0,0,0.6)',
+  "black50": 'rgba(0,0,0,0.4)',
   "white50" : 'rgba(255,255,255,0.5)'
 }
 

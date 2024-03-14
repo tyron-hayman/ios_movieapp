@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { BearerToken } from '@env';
 import {
@@ -40,7 +40,10 @@ const HomeScreen = (props) => {
   });
 
   useEffect(() => {
+    initHome();
+  }, []);
 
+  let initHome = () => {
     const options = {
       method: 'GET',
       headers: {
@@ -63,8 +66,7 @@ const HomeScreen = (props) => {
       .finally(() => {
         setLoading(false);
       });
-
-  }, []);
+  }
 
   let trendingTV = () => {
 
