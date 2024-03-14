@@ -12,6 +12,7 @@ import {
   DMSans_700Bold,
   DMSans_700Bold_Italic,
 } from '@expo-google-fonts/dm-sans';
+import GlobalLoader from './loader';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -132,7 +133,7 @@ const HomeScreen = (props) => {
   return (
     <View style={styles.container}>
           {loading ? (
-            <ActivityIndicator size="large" color="#FE8615" />
+            <GlobalLoader />
           ) : (
             <ScrollView style={styles.scrollView}>
                 <ImageBackground source={{ uri : popMovie[0].backdrop_path }} style={styles.featuredMovie}>

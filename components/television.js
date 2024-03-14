@@ -5,6 +5,7 @@ import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text
 import { LinearGradient } from 'expo-linear-gradient';
 import { BearerToken } from '@env';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import GlobalLoader from './loader';
 
 import {
   useFonts,
@@ -104,7 +105,7 @@ const Television = ({ route }) => {
     return (
         <View style={styles.container}>
             {loading ? (
-                <ActivityIndicator size="large" color="#FE8615" />
+                <GlobalLoader />
             ) : (
               <>
               <TouchableOpacity style={styles.backBtn} onPress={() =>

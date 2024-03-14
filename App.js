@@ -10,6 +10,7 @@ import AboutScreen from './components/about';
 import Movies from './components/movies';
 import Television from './components/television';
 import People from './components/people';
+import Search from './components/search';
 
 import {
   useFonts,
@@ -74,6 +75,11 @@ export default function App() {
                 component={People}
                 options={{headerShown: false}}
             />
+            <Stack.Screen
+                name="Search"
+                component={Search}
+                options={{headerShown: false}}
+            />
         </Stack.Navigator>
         <View style={styles.mainNav}>
           <View style={styles.mainNavBox}>
@@ -81,7 +87,9 @@ export default function App() {
             <Link to={{ screen: 'Home', params: { id: 'jane' } }} style={styles.navicons}>
               <Ionicons name="home-outline" size={icoDimen.size} color={icoDimen.color} />
             </Link>
-            <Ionicons style={styles.navicons} name="search" size={icoDimen.size} color={icoDimen.color} />
+            <Link to={{ screen: 'Search', params: { } }} style={styles.navicons}>
+              <Ionicons style={styles.navicons} name="search" size={icoDimen.size} color={icoDimen.color} />
+            </Link>
             <Link to={{ screen: 'About', params: { id: 'jane' } }} style={styles.navicons}>
               <Ionicons name="help-outline" size={icoDimen.size} color={icoDimen.color} />
             </Link>
