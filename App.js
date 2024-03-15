@@ -90,9 +90,6 @@ export default function App() {
             <Link to={{ screen: 'Search', params: { } }} style={styles.navicons}>
               <Ionicons style={styles.navicons} name="search" size={icoDimen.size} color={icoDimen.color} />
             </Link>
-            <Link to={{ screen: 'About', params: { id: 'jane' } }} style={styles.navicons}>
-              <Ionicons name="help-outline" size={icoDimen.size} color={icoDimen.color} />
-            </Link>
           </BlurView>
           </View>
         </View>

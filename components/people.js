@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer, useNavigation, useFocusEffect, Link } from "@react-navigation/native";
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableOpacity, Button } from 'react-native';
+import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BearerToken } from '@env';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -136,20 +136,20 @@ const People = ({ route }) => {
                         {creditDetails.cast?.map((credit, i) => {
                           if ( credit.poster_path ) {
                           let mediaLink;
-                          if ( credit.media_type == "move" ) {
+                          if ( credit.media_type == "movie" ) {
                             mediaLink = { "type" : "Movie", "id" : credit.id }
                           } else {
-                            mediaLink = { "type" : "Movie", "id" : credit.id }
+                            mediaLink = { "type" : "Television", "id" : credit.id }
                           }
                           return(
                             <View key={i} style={styles.creditBoxView}>
-                              <TouchableOpacity onPress={() =>
+                              <TouchableWithoutFeedback onPress={() =>
                                   navigation.navigate(mediaLink.type, { id: mediaLink.id })
                                 }
                               >
                                   <ImageBackground source={{ uri : imgPath + credit.poster_path }} resizeMode="cover" style={styles.creditBox}>
                                   </ImageBackground>
-                              </TouchableOpacity>
+                              </TouchableWithoutFeedback>
                             </View>
                           );
                           }

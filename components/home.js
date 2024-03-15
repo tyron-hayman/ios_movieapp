@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { BearerToken } from '@env';
@@ -167,13 +167,13 @@ const HomeScreen = (props) => {
                     {featuredMovie?.map((tren_movie, i) => {
                       return(
                         <View key={i} style={styles.trendingMovieBox}>
-                          <TouchableOpacity onPress={() =>
+                          <TouchableWithoutFeedback onPress={() =>
                               navigation.navigate('Movie', { id: tren_movie.id })
                             }
                           >
                               <ImageBackground source={{ uri : imgPath + tren_movie.poster_path }} resizeMode="cover" style={styles.trendingMovieBG}>
                               </ImageBackground>
-                          </TouchableOpacity>
+                          </TouchableWithoutFeedback>
                         </View>
                       );
                     })}
@@ -189,13 +189,13 @@ const HomeScreen = (props) => {
                     {featuredTV?.map((tren_tv, i) => {
                       return(
                         <View key={i} style={styles.trendingMovieBox}>
-                          <TouchableOpacity onPress={() =>
+                          <TouchableWithoutFeedback onPress={() =>
                               navigation.navigate('Television', { id: tren_tv.id })
                             }
                           >
                               <ImageBackground source={{ uri : imgPath + tren_tv.poster_path }} resizeMode="cover" style={styles.trendingMovieBG}>
                               </ImageBackground>
-                          </TouchableOpacity>
+                          </TouchableWithoutFeedback>
                         </View>
                       );
                     })}
@@ -211,13 +211,13 @@ const HomeScreen = (props) => {
                     {featuredPeople?.map((tren_ppl, i) => {
                       return(
                         <View key={i} style={styles.trendingMovieBox}>
-                          <TouchableOpacity onPress={() =>
+                          <TouchableWithoutFeedback onPress={() =>
                               navigation.navigate('People', { id: tren_ppl.id })
                             }
                           >
                               <ImageBackground source={{ uri : imgPath + tren_ppl.profile_path }} resizeMode="cover" style={styles.trendingMovieBG}>
                               </ImageBackground>
-                          </TouchableOpacity>
+                          </TouchableWithoutFeedback>
                         </View>
                       );
                     })}

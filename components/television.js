@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BearerToken } from '@env';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -151,13 +151,13 @@ const Television = ({ route }) => {
                             if ( movieCredit.profile_path != "" && movieCredit.profile_path ) {
                                 return(
                                     <View key={i} style={styles.creditView}>
-                                    <TouchableOpacity onPress={() =>
+                                    <TouchableWithoutFeedback onPress={() =>
                                         navigation.navigate('Movie', { id: movieCredit.id })
                                     }
                                     >
                                         <ImageBackground source={{ uri : imgPathProfile + movieCredit.profile_path }} resizeMode="cover" style={styles.creditImage}>
                                         </ImageBackground>
-                                    </TouchableOpacity>
+                                    </TouchableWithoutFeedback>
                                 </View>
                                 );
                             }
