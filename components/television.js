@@ -152,7 +152,7 @@ const Television = ({ route }) => {
                                 return(
                                     <View key={i} style={styles.creditView}>
                                     <TouchableWithoutFeedback onPress={() =>
-                                        navigation.navigate('Movie', { id: movieCredit.id })
+                                        navigation.navigate('People', { id: movieCredit.id })
                                     }
                                     >
                                         <ImageBackground source={{ uri : imgPathProfile + movieCredit.profile_path }} resizeMode="cover" style={styles.creditImage}>

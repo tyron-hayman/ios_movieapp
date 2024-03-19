@@ -209,6 +209,7 @@ const HomeScreen = (props) => {
                   showsHorizontalScrollIndicator={false}
                 >
                     {featuredPeople?.map((tren_ppl, i) => {
+                      if ( tren_ppl.profile_path ) {
                       return(
                         <View key={i} style={styles.trendingMovieBox}>
                           <TouchableWithoutFeedback onPress={() =>
@@ -220,6 +221,7 @@ const HomeScreen = (props) => {
                           </TouchableWithoutFeedback>
                         </View>
                       );
+                      }
                     })}
                 </ScrollView>
             </ScrollView>

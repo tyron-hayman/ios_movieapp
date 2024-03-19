@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, TextInput, View, Dimensions, TouchableWithoutFeedback, Text } from 'react-native';
+import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, TextInput, View, Dimensions, TouchableWithoutFeedback, Text, Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { BearerToken } from '@env';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import GlobalLoader from './loader';
+import GlobalModal from './modals';
 
 import {
   useFonts,
@@ -19,13 +20,16 @@ import {
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-const icoDimen = { size : 18, color: 'white' };
+const icoDimen = { size : 20, color: 'white' };
 let searchTimer = 0;
 
 const Search = ({ route }) => {
     const [searchInitText, setSearchInitText] = useState([]);
     const [searchText, setSearchText] = useState('');
+    const [searchPage, setSearchPage] = useState(1);
     const [searchResults, setSearchResults] = useState([]);
+    const [searchFilters, setSearchFilters] = useState([]);
+    const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [dimensions, setDimensions] = useState({
         height: windowHeight,
@@ -65,7 +69,6 @@ const Search = ({ route }) => {
         .catch(error => console.error(error))
         .finally(() => {
             setLoading(false);
-            console.log(searchInitText);
         });
 
     }
@@ -89,7 +92,7 @@ const Search = ({ route }) => {
       fetch('https://api.themoviedb.org/3/search/multi?query=' + encodeURIComponent(text) + '&include_adult=false&language=en-US&page=' + page, options)
         .then(response => response.json())
         .then(response => {
-            setSearchResults(response.results);
+          setSearchResults(response.results);
         })
         .catch(error => console.error(error))
         .finally(() => {
@@ -98,6 +101,40 @@ const Search = ({ route }) => {
 
       }, 1000);
 
+    }
+
+    let updateSeach = (text, page) => {
+      let newPage = page + 1;
+      setSearchPage(newPage);
+
+      const options = {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: 'Bearer ' + BearerToken
+        }
+      };
+  
+      fetch('https://api.themoviedb.org/3/search/multi?query=' + encodeURIComponent(text) + '&include_adult=false&language=en-US&page=' + page, options)
+        .then(response => response.json())
+        .then(response => {
+            let searchArr = searchResults;
+            searchArr.push(response.results);
+            setSearchResults(searchArr);
+        })
+        .catch(error => console.error(error))
+        .finally(() => {
+            setLoading(false);
+        });
+
+    }
+
+    let updateModalVis = (value) => {
+        if ( value ) {
+          setOpenModal(false);
+        } else {
+          setOpenModal(true);
+        }
     }
 
     return (
@@ -150,6 +187,7 @@ const Search = ({ route }) => {
                         })
                         ) : (
                           <View style={styles.noResultsWrap}>
+                            <Text style={styles.searchInitHeading}>Trending</Text>
                             <ScrollView style={styles.noResultsKeywordScrollview}
                               pagingEnabled={false}
                               horizontal={true}
@@ -168,7 +206,7 @@ const Search = ({ route }) => {
                                   mediaLink = { "type" : "Television", "id" : result.id }
                                 }
                                 return(
-                                  <TouchableWithoutFeedback onPress={() =>
+                                  <TouchableWithoutFeedback key={i} onPress={() =>
                                       navigation.navigate(mediaLink.type, { id: mediaLink.id })
                                     }
                                   >
@@ -211,7 +249,12 @@ const styles = StyleSheet.create({
         backgroundColor: branding.black50,
         padding: 20,
         paddingTop: 60,
-        zIndex: 10
+        zIndex: 10,
+        flex: 1,
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        alignContent: 'flex-start',
+        justifyContent: 'space-between',
       },
       searchBox: {
         backgroundColor: branding.white50,
@@ -219,7 +262,24 @@ const styles = StyleSheet.create({
         fontFamily: 'DMSans_500Medium',
         color: branding.white,
         fontSize: 18,
-        borderRadius: 9999
+        borderRadius: 9999,
+        width: '100%'
+      },
+      filtersBtn: {
+        overflow: 'hidden',
+        borderRadius: 9999,
+        position: 'relative',
+        zIndex: 5
+      },
+      filtersBtnIcon: {
+        backgroundColor: branding.white,
+        padding: 20
+      },
+      searchInitHeading: {
+        fontFamily: 'DMSans_700Bold',
+        color: branding.white,
+        fontSize: 20,
+        marginBottom: 20
       },
       creditScrollView: {
         paddingLeft: 20,
@@ -274,6 +334,34 @@ const styles = StyleSheet.create({
         marginRight: 20,
         borderRadius: 20,
         overflow: 'hidden'
+      },
+      modalView: {
+        margin: 20,
+        marginTop: 60,
+        backgroundColor: branding.white,
+        borderRadius: 20,
+        padding: 35,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 7,
+      },
+      button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 21,
+      },
+      buttonClose: {
+        backgroundColor: '#2196F3',
+      },
+      modalHeading: {
+        fontFamily: 'DMSans_700Bold',
+        color: branding.black,
+        fontSize: 30,
       }
 });
 
