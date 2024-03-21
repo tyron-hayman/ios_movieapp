@@ -14,18 +14,20 @@ const branding = {
   }
 
 const GlobalModal = (props) => {
-    const [modalVisible, setModalVisible] = useState(props.open);
+    let modalSettings = {
+      animation : props.animation,
+      isVisible : props.open
+    };
 
     useEffect(() => {
-        setModalVisible(props.open);
     },[props.open]);
 
   return (
     <Modal
         style={styles.modalWrap}
-        animationType={props.animation}
+        animationType={modalSettings.animation}
         transparent={true}
-        visible={modalVisible}
+        visible={modalSettings.isVisible}
         onRequestClose={() => {
             props.updateVis(props.open)
         }}>

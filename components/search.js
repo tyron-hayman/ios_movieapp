@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, TextInput, View, Dimensions, TouchableWithoutFeedback, Text, Pressable } from 'react-native';
+import ReactNative, { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, TextInput, View, Dimensions, TouchableWithoutFeedback, Text, Pressable, NativeModules } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { BearerToken } from '@env';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -22,12 +22,15 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const icoDimen = { size : 20, color: 'white' };
 let searchTimer = 0;
+let scrollTimer = 0;
+const ScrollViewManager = NativeModules.ScrollViewManager;
 
 const Search = ({ route }) => {
     const [searchInitText, setSearchInitText] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [searchPage, setSearchPage] = useState(1);
     const [searchResults, setSearchResults] = useState([]);
+    const [scrollHeight, setScrollHeight] = useState();
     const [searchFilters, setSearchFilters] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -46,6 +49,8 @@ const Search = ({ route }) => {
         DMSans_700Bold,
         DMSans_700Bold_Italic,
     });
+
+    const scrollRef = useRef();
 
     useEffect(() => {
       initSearch();
@@ -80,6 +85,14 @@ const Search = ({ route }) => {
       clearTimeout(searchTimer);
 
       searchTimer = setTimeout(() => {
+      
+      let searchArr = searchResults;
+
+      if ( text != searchText ) {
+        setSearchPage(1)
+        searchArr = [];
+        setSearchResults([]);
+      }
 
       const options = {
         method: 'GET',
@@ -92,42 +105,42 @@ const Search = ({ route }) => {
       fetch('https://api.themoviedb.org/3/search/multi?query=' + encodeURIComponent(text) + '&include_adult=false&language=en-US&page=' + page, options)
         .then(response => response.json())
         .then(response => {
-          setSearchResults(response.results);
+          searchArr.push(response.results);
+          setSearchResults(searchArr);
+          if ( text == '' ) {
+            setSearchResults([]);
+          }
         })
         .catch(error => console.error(error))
         .finally(() => {
             setLoading(false);
         });
 
-      }, 1000);
+      }, 500);
 
     }
 
-    let updateSeach = (text, page) => {
-      let newPage = page + 1;
-      setSearchPage(newPage);
+    let updateSearch = (text, page) => {
+        let term = text;
+        let pageNum = page + 1;
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+          doSearch(term, pageNum);
+          setSearchPage(pageNum)
+        }, 200);
+    }
 
-      const options = {
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: 'Bearer ' + BearerToken
-        }
-      };
+    let handleScroll = (event) => {
+      event.persist();
+      let e = event;
+      let scrollDis = e.nativeEvent.contentOffset.y;
+      let scrollMax = scrollHeight - 850;
   
-      fetch('https://api.themoviedb.org/3/search/multi?query=' + encodeURIComponent(text) + '&include_adult=false&language=en-US&page=' + page, options)
-        .then(response => response.json())
-        .then(response => {
-            let searchArr = searchResults;
-            searchArr.push(response.results);
-            setSearchResults(searchArr);
-        })
-        .catch(error => console.error(error))
-        .finally(() => {
-            setLoading(false);
-        });
-
-    }
+      if ( scrollDis > scrollMax && scrollDis > 200 ) {
+        updateSearch(searchText, searchPage);
+      }
+      
+     };
 
     let updateModalVis = (value) => {
         if ( value ) {
@@ -147,7 +160,9 @@ const Search = ({ route }) => {
                         <TextInput
                             style={styles.searchBox}
                             value={searchText}
-                            onChangeText={text => doSearch(text, 1)}
+                            onChangeText={text => { 
+                              doSearch(text, 1);
+                            }}
                             placeholder='Search movies, tv, people'
                             placeholderTextColor="#777777"
                             clearButtonMode="while-editing"
@@ -158,11 +173,18 @@ const Search = ({ route }) => {
                       pagingEnabled={false}
                       horizontal={false}
                       showsHorizontalScrollIndicator={false}
+                      ref={scrollRef}
+                      scrollEventThrottle={10}
+                      onContentSizeChange={(contentWidth, contentHeight) => {
+                        if ( contentHeight != scrollHeight ) {
+                          setScrollHeight(contentHeight);
+                        }
+                      }}
                     >
                       <View style={styles.creditBoxViewWrap}>
                         {(searchResults.length > 0 ) ? (
-                        searchResults?.map((result, i) => {
-                          let mediaLink;
+                        searchResults[0]?.map((result, i) => {
+                          let mediaLink = { "type" : null, "id" : null, "poster" : null };
                           if ( result.media_type == "movie" ) {
                             mediaLink = { "type" : "Movie", "id" : result.id, "poster" : result.poster_path }
                           } else if ( result.media_type == "person" ) {

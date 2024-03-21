@@ -93,7 +93,6 @@ const People = ({ route }) => {
             .then(response => response.json())
             .then(response => {
               setCreditDetails(response);
-              console.log(response);
             })
             .catch(error => console.error(error))
 
@@ -123,7 +122,11 @@ const People = ({ route }) => {
                     </View>
                     <View style={styles.castDetails}>
                         <Text style={styles.castName}>{personDetails.name}</Text>
-                        <Text style={styles.castBio}>{personDetails.biography}</Text>
+                        {(personDetails.biography) ? (
+                          <Text style={styles.castBio}>{personDetails.biography}</Text>
+                        ) : (
+                          <Text style={styles.castBio}>A biography of this person could not be found.</Text>
+                        )}
                     </View>
                     <View style={styles.castCreditTitle}>
                     <Text style={styles.castCredit}>Known For</Text>

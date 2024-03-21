@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, ScrollView, ImageBackground, Image, StyleSheet, Text, View, Dimensions, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { NavigationContainer, useNavigation, useFocusEffect } from "@react-navigation/native";
+import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, interpolate, extrapolation } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BearerToken } from '@env';
 import {
@@ -13,6 +14,7 @@ import {
   DMSans_700Bold_Italic,
 } from '@expo-google-fonts/dm-sans';
 import GlobalLoader from './loader';
+import Slider from './slider';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -20,6 +22,7 @@ const month = ["January","February","March","April","May","June","July","August"
 
 const HomeScreen = (props) => {
   const [featuredMovie, setFeaturedMovie] = useState([]);
+  const [trendingMovie, setTrendingMovie] = useState([]);
   const [featuredTV, setFeaturedTV] = useState([]);
   const [featuredPeople, setFeaturedPeople] = useState([]);
   const [popMovie, setPopMovie] = useState([]);
@@ -30,6 +33,7 @@ const HomeScreen = (props) => {
   });
   const imgPath = "https://image.tmdb.org/t/p/w780";
   const navigation = useNavigation();
+  const offset = useSharedValue(0);
 
   let [fontsLoaded] = useFonts({
     DMSans_400Regular,
@@ -53,11 +57,12 @@ const HomeScreen = (props) => {
       }
     };
 
-    fetch('https://api.themoviedb.org/3/movie/popular', options)
+    fetch('https://api.themoviedb.org/3/trending/all/day', options)
       .then(response => response.json())
       .then(response => {
         let movies = response.results.slice(1, 11);
         setFeaturedMovie(movies);
+        trendingMovies();
         setPopMovie([{"title" : response.results[0].title, "backdrop_path" : imgPath + response.results[0].poster_path, "vote_average" : response.results[0].vote_average }]);
         getMovieDetails(response.results[0].id);
         trendingTV();
@@ -67,6 +72,26 @@ const HomeScreen = (props) => {
       .finally(() => {
         setLoading(false);
       });
+  }
+
+  let trendingMovies = () => {
+
+    const options = {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: 'Bearer ' + BearerToken
+      }
+    };
+
+    fetch('https://api.themoviedb.org/3/trending/movie/day', options)
+      .then(response => response.json())
+      .then(response => {
+        let movies = response.results.slice(0, 10);
+        setTrendingMovie(movies);
+      })
+      .catch(error => console.error(error))
+
   }
 
   let trendingTV = () => {
@@ -132,30 +157,18 @@ const HomeScreen = (props) => {
 
   return (
     <View style={styles.container}>
+        <LinearGradient
+        // Background Linear Gradient
+        colors={['#0f0c29', '#000000']}
+        style={styles.background}
+      >
           {loading ? (
             <GlobalLoader />
           ) : (
             <ScrollView style={styles.scrollView}>
-                <ImageBackground source={{ uri : popMovie[0].backdrop_path }} style={styles.featuredMovie}>
-                  <LinearGradient
-                    // Background Linear Gradient
-                    colors={['transparent', 'rgba(0,0,0,1)']}
-                    style={styles.backgroundGrad}
-                  >
-                  <View style={styles.movieDetailsGenre}>
-                    {popMovieDetails.genres?.map((genre, i) => {
-                      return(<Text key={i} style={styles.featuredMovieGenres}>{genre.name}</Text>);
-                    })}
-                  </View>
-                  <View style={styles.movieDetailsTitle}>
-                    <Text style={styles.featuredMovieTitle}>{popMovie[0].title}</Text>
-                  </View>
-                  <View style={styles.movieDetails}>
-                    <Text style={styles.featuredMovieHeadinng}>{popMovieDetails.release_date}</Text>
-                    <Text style={styles.featuredMovieHeadinng}>{popMovieDetails.runtime} MIN</Text>
-                  </View>
-                  </LinearGradient>
-                </ImageBackground>
+                <View style={styles.featureSlider}>
+                <Slider data={featuredMovie} />
+                </View>
                 <View style={styles.moviePopularList}>
                     <Text style={styles.moviePopularListTitle}>Trending Movies</Text>
                 </View>
@@ -164,7 +177,7 @@ const HomeScreen = (props) => {
                   horizontal={true}
                   showsHorizontalScrollIndicator={false}
                 >
-                    {featuredMovie?.map((tren_movie, i) => {
+                    {trendingMovie?.map((tren_movie, i) => {
                       return(
                         <View key={i} style={styles.trendingMovieBox}>
                           <TouchableWithoutFeedback onPress={() =>
@@ -226,6 +239,7 @@ const HomeScreen = (props) => {
                 </ScrollView>
             </ScrollView>
           )}
+      </LinearGradient>
     </View>
   );
 }
@@ -250,14 +264,25 @@ const styles = StyleSheet.create({
     width: windowWidth,
     flex: 1,
   },
-  featuredMovie: {
+  featureSlider : {
     width: windowWidth,
-    height: windowWidth * 1.5,
-    marginBottom: 60,
+    marginBottom: 100,
+    marginTop: 100
+  },
+  scrollViewfeatureSlider: {
+    width : windowWidth,
+  },
+  featureSlide: {
+    width : windowWidth,
+  },
+  featureImage: {
+    width: windowWidth - 50,
+    height: ( windowWidth - 50 ) * 1.5,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    overflow : 'hidden'
   },
   backgroundGrad: {
     width: windowWidth,
@@ -324,7 +349,7 @@ const styles = StyleSheet.create({
   moviePopularListTitle: {
     fontFamily: 'DMSans_700Bold',
     color: branding.white,
-    fontSize: 25,
+    fontSize: 20,
     marginBottom: 20,
     marginLeft: '5%',
     shadowColor: branding.black,
@@ -335,14 +360,14 @@ const styles = StyleSheet.create({
     marginBottom: 100
   },
   trendingMovieBox: {
-    width: 200,
+    width: 150,
     marginRight: 30,
     borderRadius: 15,
     overflow: 'hidden'
   },
   trendingMovieBG: {
     width: '100%',
-    height: 300
+    height: 150 * 1.5
   }
 });
 

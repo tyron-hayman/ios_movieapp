@@ -75,7 +75,6 @@ const Television = ({ route }) => {
             setMovieDetails(response);
             setMovieDetailsDate(dateName);
             getMovieCredits(route.params.id);
-            console.log(response);
         })
         .catch(error => console.error(error))
         .finally(() => {
@@ -133,7 +132,9 @@ const Television = ({ route }) => {
                     </ImageBackground>
                     <View style={styles.movieDetails}>
                         <Text style={styles.movieDetailsHeadinng}><Ionicons style={styles.navicons} name="calendar" size={icoDimen.size} color={icoDimen.color} /> {movieDetailsDate}</Text>
-                        <Text style={styles.movieDetailsHeadinng}><Ionicons style={styles.navicons} name="timer" size={icoDimen.size} color={icoDimen.color} /> {movieDetails.last_episode_to_air.runtime} MIN</Text>
+                        {(movieDetails.last_episode_to_air) ? (
+                          <Text style={styles.movieDetailsHeadinng}><Ionicons style={styles.navicons} name="timer" size={icoDimen.size} color={icoDimen.color} /> {movieDetails.last_episode_to_air.runtime} MIN</Text>
+                        ) : (null)}
                         <Text style={styles.movieDetailsHeadinng}><Ionicons style={styles.navicons} name="star" size={icoDimen.size} color="#FCA708" /> {Math.round(movieDetails.vote_average)}/10</Text>
                     </View>
                     <View style={styles.movieDetailsDesc}>
